@@ -39,13 +39,47 @@ function parseLogLevel(value: string | undefined): AppConfig["logLevel"] {
   return "info";
 }
 
+function optionalEnv(name: string): string | undefined {
+  return Bun.env[name]?.trim() || undefined;
+}
+
+function buildProxyUrl(): string | undefined {
+  const legacyProxyUrl = optionalEnv("TELEGRAM_PROXY_URL");
+  if (legacyProxyUrl) {
+    return legacyProxyUrl;
+  }
+
+  const host = optionalEnv("TELEGRAM_PROXY_HOST");
+  const port = optionalEnv("TELEGRAM_PROXY_PORT");
+
+  if (!host && !port) {
+    return undefined;
+  }
+
+  if (!host || !port) {
+    throw new AppError(
+      "TELEGRAM_PROXY_HOST and TELEGRAM_PROXY_PORT must be set together",
+      500,
+    );
+  }
+
+  const username = optionalEnv("TELEGRAM_PROXY_USERNAME");
+  const password = optionalEnv("TELEGRAM_PROXY_PASSWORD");
+  const credentials =
+    username && password
+      ? `${encodeURIComponent(username)}:${encodeURIComponent(password)}@`
+      : "";
+
+  return `http://${credentials}${host}:${port}`;
+}
+
 export function loadConfig(): AppConfig {
   return {
     host: Bun.env.HOST?.trim() || "0.0.0.0",
     port: parsePort(Bun.env.PORT),
     telegramBotToken: requiredEnv("TELEGRAM_BOT_TOKEN"),
     telegramChatId: requiredEnv("TELEGRAM_CHAT_ID"),
-    telegramProxyUrl: Bun.env.TELEGRAM_PROXY_URL?.trim() || undefined,
+    telegramProxyUrl: buildProxyUrl(),
     webhookToken: Bun.env.WEBHOOK_TOKEN?.trim() || undefined,
     logLevel: parseLogLevel(Bun.env.LOG_LEVEL),
     disableWebPagePreview: truthy.has(

@@ -28,7 +28,11 @@ Copy `.env.example` to `.env` and set:
 | --- | --- | --- | --- |
 | `TELEGRAM_BOT_TOKEN` | yes | - | Telegram bot token. |
 | `TELEGRAM_CHAT_ID` | yes | - | Target Telegram chat ID. Groups and channels often start with `-100`. |
-| `TELEGRAM_PROXY_URL` | no | - | Optional proxy URL for Telegram API calls, for example `http://user:pass@proxy.example.com:8080`. If empty, Telegram is called directly. |
+| `TELEGRAM_PROXY_HOST` | no | - | Optional proxy host for Telegram API calls. If empty, Telegram is called directly. |
+| `TELEGRAM_PROXY_PORT` | no | - | Optional proxy port. Required when `TELEGRAM_PROXY_HOST` is set. |
+| `TELEGRAM_PROXY_USERNAME` | no | - | Optional proxy username. |
+| `TELEGRAM_PROXY_PASSWORD` | no | - | Optional proxy password. |
+| `TELEGRAM_PROXY_URL` | no | - | Backwards-compatible full proxy URL override, for example `http://user:pass@proxy.example.com:8080`. Prefer the separate proxy variables above for new deployments. |
 | `WEBHOOK_TOKEN` | recommended | - | Shared token accepted as `/webhook/:token` or `/webhook?token=...`. If empty, `/webhook` is public. |
 | `HOST` | no | `0.0.0.0` | HTTP bind host. |
 | `PORT` | no | `3000` | HTTP bind port. Set `8080` for Dokploy or platforms that route to that port. |
@@ -87,6 +91,28 @@ Or use Compose:
 ```bash
 docker compose up -d --build
 ```
+
+## Telegram Proxy
+
+For a proxy without authentication:
+
+```env
+TELEGRAM_PROXY_HOST=proxy.example.com
+TELEGRAM_PROXY_PORT=8080
+TELEGRAM_PROXY_USERNAME=
+TELEGRAM_PROXY_PASSWORD=
+```
+
+For a proxy with authentication:
+
+```env
+TELEGRAM_PROXY_HOST=proxy.example.com
+TELEGRAM_PROXY_PORT=8080
+TELEGRAM_PROXY_USERNAME=my-user
+TELEGRAM_PROXY_PASSWORD=my-password
+```
+
+The bridge URL-encodes username and password before passing the proxy URL to Bun `fetch`.
 
 ## API
 
