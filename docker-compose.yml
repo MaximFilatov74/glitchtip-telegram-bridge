@@ -4,6 +4,8 @@ services:
     restart: unless-stopped
     ports:
       - "${PORT:-3000}:${PORT:-3000}"
+    networks:
+      - glitchtip-bridge
     environment:
       TELEGRAM_BOT_TOKEN: "${TELEGRAM_BOT_TOKEN}"
       TELEGRAM_CHAT_ID: "${TELEGRAM_CHAT_ID}"
@@ -17,3 +19,7 @@ services:
       PORT: "${PORT:-3000}"
       LOG_LEVEL: "${LOG_LEVEL:-info}"
       TELEGRAM_DISABLE_WEB_PAGE_PREVIEW: "${TELEGRAM_DISABLE_WEB_PAGE_PREVIEW:-false}"
+
+networks:
+  glitchtip-bridge:
+    external: true

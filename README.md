@@ -89,7 +89,22 @@ docker run --rm -p 8080:8080 --env-file .env glitchtip-telegram-bridge
 Or use Compose:
 
 ```bash
+docker network create glitchtip-bridge
 docker compose up -d --build
+```
+
+When GlitchTip runs from another Compose project on the same Docker host, attach its web/worker service to the same external network:
+
+```yaml
+networks:
+  glitchtip-bridge:
+    external: true
+```
+
+Then use this webhook URL from GlitchTip:
+
+```text
+http://glitchtip-telegram-bridge:8080/webhook/change-me
 ```
 
 ## Telegram Proxy
