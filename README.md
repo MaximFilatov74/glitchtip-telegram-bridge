@@ -79,44 +79,80 @@ https://bridge.example.com/webhook?token=change-me
 
 ## Docker
 
-The simplest deployment path uses the prebuilt GHCR image and only needs `docker-compose.yml` plus `.env`:
+Create `.env`:
 
-```bash
-mkdir glitchtip-telegram-bridge
-cd glitchtip-telegram-bridge
-curl -fsSLO https://raw.githubusercontent.com/MaximFilatov74/glitchtip-telegram-bridge/main/docker-compose.yml
-curl -fsSLo .env https://raw.githubusercontent.com/MaximFilatov74/glitchtip-telegram-bridge/main/.env.example
+```env
+TELEGRAM_BOT_TOKEN=123456:replace-me
+TELEGRAM_CHAT_ID=-1001234567890
+TELEGRAM_PROXY_URL=
+TELEGRAM_PROXY_HOST=
+TELEGRAM_PROXY_PORT=
+TELEGRAM_PROXY_USERNAME=
+TELEGRAM_PROXY_PASSWORD=
+WEBHOOK_TOKEN=change-me
+HOST=0.0.0.0
+PORT=8080
+LOG_LEVEL=info
+TELEGRAM_DISABLE_WEB_PAGE_PREVIEW=false
 ```
 
-Edit `.env`, then start:
+Create `docker-compose.yml`:
+
+```yaml
+services:
+  glitchtip-telegram-bridge:
+    image: ghcr.io/maximfilatov74/glitchtip-telegram-bridge:latest
+    restart: unless-stopped
+    ports:
+      - "${PORT:-8080}:${PORT:-8080}"
+    environment:
+      TELEGRAM_BOT_TOKEN: "${TELEGRAM_BOT_TOKEN}"
+      TELEGRAM_CHAT_ID: "${TELEGRAM_CHAT_ID}"
+      TELEGRAM_PROXY_URL: "${TELEGRAM_PROXY_URL:-}"
+      TELEGRAM_PROXY_HOST: "${TELEGRAM_PROXY_HOST:-}"
+      TELEGRAM_PROXY_PORT: "${TELEGRAM_PROXY_PORT:-}"
+      TELEGRAM_PROXY_USERNAME: "${TELEGRAM_PROXY_USERNAME:-}"
+      TELEGRAM_PROXY_PASSWORD: "${TELEGRAM_PROXY_PASSWORD:-}"
+      WEBHOOK_TOKEN: "${WEBHOOK_TOKEN}"
+      HOST: "0.0.0.0"
+      PORT: "${PORT:-8080}"
+      LOG_LEVEL: "${LOG_LEVEL:-info}"
+      TELEGRAM_DISABLE_WEB_PAGE_PREVIEW: "${TELEGRAM_DISABLE_WEB_PAGE_PREVIEW:-false}"
+```
+
+Pull the image and start the service:
 
 ```bash
+docker compose pull
 docker compose up -d
 ```
 
 Check the service:
 
-```bash
-curl http://localhost:8080/health
-```
-
-If you cloned the repository and want to build the image locally instead of pulling from GHCR:
-
-```bash
-docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
-```
+Open `http://localhost:8080/health` in a browser or run `docker compose ps`.
 
 ### Same-host GlitchTip
 
-When GlitchTip runs from another Compose project on the same Docker host, use the shared network override:
+When GlitchTip runs from another Compose project on the same Docker host, create a shared Docker network:
 
 ```bash
-curl -fsSLO https://raw.githubusercontent.com/MaximFilatov74/glitchtip-telegram-bridge/main/docker-compose.shared-network.yml
 docker network create glitchtip-bridge
-docker compose -f docker-compose.yml -f docker-compose.shared-network.yml up -d
 ```
 
-Attach the GlitchTip `web` and `worker` services to the same external network:
+Attach the bridge service to it:
+
+```yaml
+services:
+  glitchtip-telegram-bridge:
+    networks:
+      - glitchtip-bridge
+
+networks:
+  glitchtip-bridge:
+    external: true
+```
+
+Attach the GlitchTip `web` and `worker` services to the same network:
 
 ```yaml
 networks:
@@ -129,8 +165,6 @@ Then use this webhook URL from GlitchTip:
 ```text
 http://glitchtip-telegram-bridge:8080/webhook/change-me
 ```
-
-If the GHCR image is unavailable, the maintainer must make the package public after the first GitHub Actions publish run.
 
 ## Telegram Proxy
 
