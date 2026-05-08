@@ -94,6 +94,8 @@ HOST=0.0.0.0
 PORT=8080
 LOG_LEVEL=info
 TELEGRAM_DISABLE_WEB_PAGE_PREVIEW=false
+GLITCHTIP_NETWORK=
+GLITCHTIP_NETWORK_EXTERNAL=false
 ```
 
 Create `docker-compose.yml`:
@@ -105,6 +107,10 @@ services:
     restart: unless-stopped
     ports:
       - "${PORT:-8080}:${PORT:-8080}"
+    networks:
+      glitchtip-network:
+        aliases:
+          - glitchtip-telegram-bridge
     environment:
       TELEGRAM_BOT_TOKEN: "${TELEGRAM_BOT_TOKEN}"
       TELEGRAM_CHAT_ID: "${TELEGRAM_CHAT_ID}"
@@ -118,6 +124,11 @@ services:
       PORT: "${PORT:-8080}"
       LOG_LEVEL: "${LOG_LEVEL:-info}"
       TELEGRAM_DISABLE_WEB_PAGE_PREVIEW: "${TELEGRAM_DISABLE_WEB_PAGE_PREVIEW:-false}"
+
+networks:
+  glitchtip-network:
+    name: "${GLITCHTIP_NETWORK:-glitchtip-telegram-bridge}"
+    external: ${GLITCHTIP_NETWORK_EXTERNAL:-false}
 ```
 
 Pull the image and start the service:
@@ -133,31 +144,27 @@ Open `http://localhost:8080/health` in a browser or run `docker compose ps`.
 
 ### Same-host GlitchTip
 
-When GlitchTip runs from another Compose project on the same Docker host, create a shared Docker network:
+When GlitchTip runs from another Compose project on the same Docker host, leave the GlitchTip compose file unchanged and attach the bridge to GlitchTip's existing Docker network.
+
+Find the GlitchTip network name from a GlitchTip container:
 
 ```bash
-docker network create glitchtip-bridge
+docker inspect <glitchtip-worker-container> --format '{{range $name, $_ := .NetworkSettings.Networks}}{{println $name}}{{end}}'
 ```
 
-Attach the bridge service to it:
+Set these variables in the bridge `.env`:
 
-```yaml
-services:
-  glitchtip-telegram-bridge:
-    networks:
-      - glitchtip-bridge
-
-networks:
-  glitchtip-bridge:
-    external: true
+```env
+GLITCHTIP_NETWORK=<glitchtip-network-name>
+GLITCHTIP_NETWORK_EXTERNAL=true
 ```
 
-Attach the GlitchTip `web` and `worker` services to the same network:
+Redeploy the bridge. It will join the existing GlitchTip network with the alias `glitchtip-telegram-bridge`.
 
-```yaml
-networks:
-  glitchtip-bridge:
-    external: true
+Check from the GlitchTip worker container:
+
+```bash
+wget -qO- http://glitchtip-telegram-bridge:8080/health
 ```
 
 Then use this webhook URL from GlitchTip:
