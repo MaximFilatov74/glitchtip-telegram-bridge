@@ -58,6 +58,11 @@ export const app = new Elysia()
     set.status = 500;
     return { ok: false, error: "Internal server error" };
   })
+  .get("/", () => ({
+    ok: true,
+    service: "glitchtip-telegram-bridge",
+    health: "/health",
+  }))
   .get("/health", () => ({
     ok: true,
     service: "glitchtip-telegram-bridge",

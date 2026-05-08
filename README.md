@@ -190,6 +190,14 @@ The bridge URL-encodes username and password before passing the proxy URL to Bun
 
 ## API
 
+### `GET /`
+
+Returns a small readiness response:
+
+```json
+{ "ok": true, "service": "glitchtip-telegram-bridge", "health": "/health" }
+```
+
 ### `GET /health`
 
 Returns:
