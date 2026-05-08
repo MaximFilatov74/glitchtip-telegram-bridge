@@ -166,6 +166,8 @@ Then use this webhook URL from GlitchTip:
 http://glitchtip-telegram-bridge:8080/webhook/change-me
 ```
 
+For Dokploy, set `Compose Path` to `./docker-compose.dokploy.yml` after creating the external `glitchtip-bridge` network. This file uses `expose` instead of host `ports` and attaches the bridge service to the shared Docker network.
+
 ## Telegram Proxy
 
 For a proxy without authentication:
