@@ -10,6 +10,7 @@ GlitchTip general webhooks send Slack-like JSON with `text` and `attachments`. T
 - Bun runtime, package manager, test runner, and Docker base image.
 - Supports GlitchTip general webhook payloads and test notifications.
 - Optional shared token in the webhook URL because GlitchTip webhooks do not require custom headers.
+- Optional Telegram HTTP/HTTPS proxy via Bun's native `fetch` proxy support.
 - Telegram HTML escaping and message truncation for Telegram's 4096 character limit.
 - `/health` endpoint for containers and uptime checks.
 
@@ -27,9 +28,10 @@ Copy `.env.example` to `.env` and set:
 | --- | --- | --- | --- |
 | `TELEGRAM_BOT_TOKEN` | yes | - | Telegram bot token. |
 | `TELEGRAM_CHAT_ID` | yes | - | Target Telegram chat ID. Groups and channels often start with `-100`. |
+| `TELEGRAM_PROXY_URL` | no | - | Optional proxy URL for Telegram API calls, for example `http://user:pass@proxy.example.com:8080`. If empty, Telegram is called directly. |
 | `WEBHOOK_TOKEN` | recommended | - | Shared token accepted as `/webhook/:token` or `/webhook?token=...`. If empty, `/webhook` is public. |
 | `HOST` | no | `0.0.0.0` | HTTP bind host. |
-| `PORT` | no | `3000` | HTTP bind port. |
+| `PORT` | no | `3000` | HTTP bind port. Set `8080` for Dokploy or platforms that route to that port. |
 | `LOG_LEVEL` | no | `info` | `info`, `debug`, or `silent`. |
 | `TELEGRAM_DISABLE_WEB_PAGE_PREVIEW` | no | `false` | Set to `true` to disable issue link previews. |
 
@@ -77,7 +79,7 @@ Build and run directly:
 
 ```bash
 docker build -t glitchtip-telegram-bridge .
-docker run --rm -p 3000:3000 --env-file .env glitchtip-telegram-bridge
+docker run --rm -p 8080:8080 --env-file .env glitchtip-telegram-bridge
 ```
 
 Or use Compose:
@@ -127,6 +129,7 @@ Example payload:
 ## Production Notes
 
 - Always set `WEBHOOK_TOKEN` unless the bridge is protected by a private network or reverse proxy rules.
+- If deploy logs still show `port:3000`, the runtime did not receive `PORT=8080` or an old image/Compose config is still running. Rebuild and redeploy after changing environment variables.
 - Keep the bridge behind HTTPS when exposed publicly.
 - Make sure the Telegram bot can post to the target chat. For channels, add it as an administrator.
 - GlitchTip general webhook payloads are intentionally small; the bridge keeps unknown payload fields out of Telegram messages but accepts them for forward compatibility.

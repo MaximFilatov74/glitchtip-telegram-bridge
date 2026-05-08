@@ -12,6 +12,7 @@ const config = loadConfig();
 const telegram = new TelegramClient({
   botToken: config.telegramBotToken,
   chatId: config.telegramChatId,
+  proxyUrl: config.telegramProxyUrl,
   disableWebPagePreview: config.disableWebPagePreview,
 });
 
@@ -109,6 +110,7 @@ if (import.meta.main) {
   logInfo("server started", {
     host: config.host,
     port: config.port,
+    telegramProxyEnabled: Boolean(config.telegramProxyUrl),
     tokenRequired: Boolean(config.webhookToken),
   });
 }

@@ -5,6 +5,7 @@ const TELEGRAM_REQUEST_TIMEOUT_MS = 10_000;
 export type TelegramClientConfig = {
   botToken: string;
   chatId: string;
+  proxyUrl?: string;
   disableWebPagePreview: boolean;
 };
 
@@ -31,6 +32,7 @@ export class TelegramClient {
         parse_mode: "HTML",
         disable_web_page_preview: this.config.disableWebPagePreview,
       }),
+      proxy: this.config.proxyUrl,
       signal: AbortSignal.timeout(TELEGRAM_REQUEST_TIMEOUT_MS),
     });
 

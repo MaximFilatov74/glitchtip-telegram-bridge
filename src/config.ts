@@ -5,6 +5,7 @@ export type AppConfig = {
   port: number;
   telegramBotToken: string;
   telegramChatId: string;
+  telegramProxyUrl?: string;
   webhookToken?: string;
   logLevel: "silent" | "info" | "debug";
   disableWebPagePreview: boolean;
@@ -44,6 +45,7 @@ export function loadConfig(): AppConfig {
     port: parsePort(Bun.env.PORT),
     telegramBotToken: requiredEnv("TELEGRAM_BOT_TOKEN"),
     telegramChatId: requiredEnv("TELEGRAM_CHAT_ID"),
+    telegramProxyUrl: Bun.env.TELEGRAM_PROXY_URL?.trim() || undefined,
     webhookToken: Bun.env.WEBHOOK_TOKEN?.trim() || undefined,
     logLevel: parseLogLevel(Bun.env.LOG_LEVEL),
     disableWebPagePreview: truthy.has(
