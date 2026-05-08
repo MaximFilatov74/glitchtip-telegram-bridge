@@ -1,0 +1,20 @@
+{
+  "name": "glitchtip-telegram-bridge",
+  "version": "0.1.0",
+  "description": "Small ElysiaJS bridge that forwards GlitchTip webhook alerts to a Telegram bot chat.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "bun --watch src/index.ts",
+    "start": "bun src/index.ts",
+    "test": "bun test",
+    "typecheck": "bunx tsc --noEmit"
+  },
+  "dependencies": {
+    "elysia": "^1.2.12"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.2",
+    "typescript": "^5.7.3"
+  }
+}
