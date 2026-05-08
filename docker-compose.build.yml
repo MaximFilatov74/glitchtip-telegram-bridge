@@ -1,0 +1,3 @@
+services:
+  glitchtip-telegram-bridge:
+    build: .

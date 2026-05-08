@@ -23,7 +23,7 @@ function requiredEnv(name: string): string {
 }
 
 function parsePort(value: string | undefined): number {
-  const port = Number(value ?? "3000");
+  const port = Number(value ?? "8080");
   if (!Number.isInteger(port) || port < 1 || port > 65535) {
     throw new AppError("PORT must be an integer between 1 and 65535", 500);
   }

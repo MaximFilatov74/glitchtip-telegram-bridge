@@ -35,7 +35,7 @@ Copy `.env.example` to `.env` and set:
 | `TELEGRAM_PROXY_URL` | no | - | Backwards-compatible full proxy URL override, for example `http://user:pass@proxy.example.com:8080`. Prefer the separate proxy variables above for new deployments. |
 | `WEBHOOK_TOKEN` | recommended | - | Shared token accepted as `/webhook/:token` or `/webhook?token=...`. If empty, `/webhook` is public. |
 | `HOST` | no | `0.0.0.0` | HTTP bind host. |
-| `PORT` | no | `3000` | HTTP bind port. Set `8080` for Dokploy or platforms that route to that port. |
+| `PORT` | no | `8080` | HTTP bind port. |
 | `LOG_LEVEL` | no | `info` | `info`, `debug`, or `silent`. |
 | `TELEGRAM_DISABLE_WEB_PAGE_PREVIEW` | no | `false` | Set to `true` to disable issue link previews. |
 
@@ -79,21 +79,44 @@ https://bridge.example.com/webhook?token=change-me
 
 ## Docker
 
-Build and run directly:
+The simplest deployment path uses the prebuilt GHCR image and only needs `docker-compose.yml` plus `.env`:
 
 ```bash
-docker build -t glitchtip-telegram-bridge .
-docker run --rm -p 8080:8080 --env-file .env glitchtip-telegram-bridge
+mkdir glitchtip-telegram-bridge
+cd glitchtip-telegram-bridge
+curl -fsSLO https://raw.githubusercontent.com/MaximFilatov74/glitchtip-telegram-bridge/main/docker-compose.yml
+curl -fsSLo .env https://raw.githubusercontent.com/MaximFilatov74/glitchtip-telegram-bridge/main/.env.example
 ```
 
-Or use Compose:
+Edit `.env`, then start:
 
 ```bash
+docker compose up -d
+```
+
+Check the service:
+
+```bash
+curl http://localhost:8080/health
+```
+
+If you cloned the repository and want to build the image locally instead of pulling from GHCR:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
+```
+
+### Same-host GlitchTip
+
+When GlitchTip runs from another Compose project on the same Docker host, use the shared network override:
+
+```bash
+curl -fsSLO https://raw.githubusercontent.com/MaximFilatov74/glitchtip-telegram-bridge/main/docker-compose.shared-network.yml
 docker network create glitchtip-bridge
-docker compose up -d --build
+docker compose -f docker-compose.yml -f docker-compose.shared-network.yml up -d
 ```
 
-When GlitchTip runs from another Compose project on the same Docker host, attach its web/worker service to the same external network:
+Attach the GlitchTip `web` and `worker` services to the same external network:
 
 ```yaml
 networks:
@@ -106,6 +129,8 @@ Then use this webhook URL from GlitchTip:
 ```text
 http://glitchtip-telegram-bridge:8080/webhook/change-me
 ```
+
+If the GHCR image is unavailable, the maintainer must make the package public after the first GitHub Actions publish run.
 
 ## Telegram Proxy
 

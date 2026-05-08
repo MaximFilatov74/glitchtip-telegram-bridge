@@ -11,5 +11,5 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY package.json ./
 COPY src ./src
 USER bun
-EXPOSE 3000
+EXPOSE 8080
 CMD ["bun", "src/index.ts"]

@@ -1,11 +1,9 @@
 services:
   glitchtip-telegram-bridge:
-    build: .
+    image: ghcr.io/maximfilatov74/glitchtip-telegram-bridge:latest
     restart: unless-stopped
     ports:
-      - "${PORT:-3000}:${PORT:-3000}"
-    networks:
-      - glitchtip-bridge
+      - "${PORT:-8080}:${PORT:-8080}"
     environment:
       TELEGRAM_BOT_TOKEN: "${TELEGRAM_BOT_TOKEN}"
       TELEGRAM_CHAT_ID: "${TELEGRAM_CHAT_ID}"
@@ -16,10 +14,6 @@ services:
       TELEGRAM_PROXY_PASSWORD: "${TELEGRAM_PROXY_PASSWORD:-}"
       WEBHOOK_TOKEN: "${WEBHOOK_TOKEN}"
       HOST: "0.0.0.0"
-      PORT: "${PORT:-3000}"
+      PORT: "${PORT:-8080}"
       LOG_LEVEL: "${LOG_LEVEL:-info}"
       TELEGRAM_DISABLE_WEB_PAGE_PREVIEW: "${TELEGRAM_DISABLE_WEB_PAGE_PREVIEW:-false}"
-
-networks:
-  glitchtip-bridge:
-    external: true

@@ -1,0 +1,8 @@
+services:
+  glitchtip-telegram-bridge:
+    networks:
+      - glitchtip-bridge
+
+networks:
+  glitchtip-bridge:
+    external: true

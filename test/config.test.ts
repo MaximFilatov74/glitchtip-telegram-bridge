@@ -39,6 +39,14 @@ function setRequiredEnv() {
 afterEach(resetEnv);
 
 describe("loadConfig", () => {
+  test("uses 8080 as the default port", () => {
+    resetEnv();
+    setRequiredEnv();
+    delete Bun.env.PORT;
+
+    expect(loadConfig().port).toBe(8080);
+  });
+
   test("builds proxy URL from separate host and port settings", () => {
     resetEnv();
     setRequiredEnv();
