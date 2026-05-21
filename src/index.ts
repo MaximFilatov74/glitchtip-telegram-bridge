@@ -57,10 +57,14 @@ function startupMessage() {
 
 async function sendStartupNotification() {
   if (!config.startupNotificationEnabled) {
+    logInfo("startup notification disabled");
     return;
   }
 
   try {
+    logInfo("startup notification sending", {
+      telegramProxyEnabled: Boolean(config.telegramProxyUrl),
+    });
     await telegram.sendMessage(startupMessage());
     logInfo("startup notification sent");
   } catch (error) {
@@ -144,8 +148,9 @@ if (import.meta.main) {
     host: config.host,
     port: config.port,
     telegramProxyEnabled: Boolean(config.telegramProxyUrl),
+    startupNotificationEnabled: config.startupNotificationEnabled,
     tokenRequired: Boolean(config.webhookToken),
   });
 
-  sendStartupNotification();
+  void sendStartupNotification();
 }
