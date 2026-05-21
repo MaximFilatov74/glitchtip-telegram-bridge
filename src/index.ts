@@ -86,6 +86,11 @@ export const app = new Elysia()
       return { ok: false, error: "Invalid webhook payload" };
     }
 
+    if (code === "NOT_FOUND") {
+      set.status = 404;
+      return { ok: false, error: "Not found" };
+    }
+
     console.error(error);
     set.status = 500;
     return { ok: false, error: "Internal server error" };
