@@ -14,6 +14,7 @@ const envKeys = [
   "PORT",
   "LOG_LEVEL",
   "TELEGRAM_DISABLE_WEB_PAGE_PREVIEW",
+  "STARTUP_NOTIFICATION_ENABLED",
 ] as const;
 
 const originalEnv = Object.fromEntries(
@@ -45,6 +46,22 @@ describe("loadConfig", () => {
     delete Bun.env.PORT;
 
     expect(loadConfig().port).toBe(8080);
+  });
+
+  test("sends startup notifications by default", () => {
+    resetEnv();
+    setRequiredEnv();
+    delete Bun.env.STARTUP_NOTIFICATION_ENABLED;
+
+    expect(loadConfig().startupNotificationEnabled).toBe(true);
+  });
+
+  test("can disable startup notifications", () => {
+    resetEnv();
+    setRequiredEnv();
+    Bun.env.STARTUP_NOTIFICATION_ENABLED = "false";
+
+    expect(loadConfig().startupNotificationEnabled).toBe(false);
   });
 
   test("builds proxy URL from separate host and port settings", () => {

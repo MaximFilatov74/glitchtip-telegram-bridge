@@ -9,9 +9,11 @@ export type AppConfig = {
   webhookToken?: string;
   logLevel: "silent" | "info" | "debug";
   disableWebPagePreview: boolean;
+  startupNotificationEnabled: boolean;
 };
 
 const truthy = new Set(["1", "true", "yes", "on"]);
+const falsy = new Set(["0", "false", "no", "off"]);
 
 function requiredEnv(name: string): string {
   const value = Bun.env[name]?.trim();
@@ -41,6 +43,23 @@ function parseLogLevel(value: string | undefined): AppConfig["logLevel"] {
 
 function optionalEnv(name: string): string | undefined {
   return Bun.env[name]?.trim() || undefined;
+}
+
+function parseBoolean(value: string | undefined, defaultValue: boolean): boolean {
+  const normalized = value?.trim().toLowerCase();
+  if (!normalized) {
+    return defaultValue;
+  }
+
+  if (truthy.has(normalized)) {
+    return true;
+  }
+
+  if (falsy.has(normalized)) {
+    return false;
+  }
+
+  return defaultValue;
 }
 
 function buildProxyUrl(): string | undefined {
@@ -82,8 +101,13 @@ export function loadConfig(): AppConfig {
     telegramProxyUrl: buildProxyUrl(),
     webhookToken: Bun.env.WEBHOOK_TOKEN?.trim() || undefined,
     logLevel: parseLogLevel(Bun.env.LOG_LEVEL),
-    disableWebPagePreview: truthy.has(
-      Bun.env.TELEGRAM_DISABLE_WEB_PAGE_PREVIEW?.trim().toLowerCase() ?? "",
+    disableWebPagePreview: parseBoolean(
+      Bun.env.TELEGRAM_DISABLE_WEB_PAGE_PREVIEW,
+      false,
+    ),
+    startupNotificationEnabled: parseBoolean(
+      Bun.env.STARTUP_NOTIFICATION_ENABLED,
+      true,
     ),
   };
 }

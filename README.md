@@ -38,6 +38,7 @@ Copy `.env.example` to `.env` and set:
 | `PORT` | no | `8080` | HTTP bind port. |
 | `LOG_LEVEL` | no | `info` | `info`, `debug`, or `silent`. |
 | `TELEGRAM_DISABLE_WEB_PAGE_PREVIEW` | no | `false` | Set to `true` to disable issue link previews. |
+| `STARTUP_NOTIFICATION_ENABLED` | no | `true` | Send a Telegram message after the bridge starts. Startup notification failures are logged but do not stop the service. |
 
 ## Local Development
 
@@ -94,6 +95,7 @@ HOST=0.0.0.0
 PORT=8080
 LOG_LEVEL=info
 TELEGRAM_DISABLE_WEB_PAGE_PREVIEW=false
+STARTUP_NOTIFICATION_ENABLED=true
 GLITCHTIP_NETWORK=
 GLITCHTIP_NETWORK_EXTERNAL=false
 ```
@@ -124,6 +126,7 @@ services:
       PORT: "${PORT:-8080}"
       LOG_LEVEL: "${LOG_LEVEL:-info}"
       TELEGRAM_DISABLE_WEB_PAGE_PREVIEW: "${TELEGRAM_DISABLE_WEB_PAGE_PREVIEW:-false}"
+      STARTUP_NOTIFICATION_ENABLED: "${STARTUP_NOTIFICATION_ENABLED:-true}"
 
 networks:
   glitchtip-network:

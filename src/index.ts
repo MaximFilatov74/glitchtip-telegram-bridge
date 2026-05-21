@@ -42,6 +42,34 @@ function logInfo(message: string, meta?: Record<string, unknown>) {
   console.info(JSON.stringify({ level: "info", message, ...meta }));
 }
 
+function logError(message: string, meta?: Record<string, unknown>) {
+  console.error(JSON.stringify({ level: "error", message, ...meta }));
+}
+
+function startupMessage() {
+  return [
+    "<b>GlitchTip Telegram Bridge started</b>",
+    `Service is listening on port ${config.port}.`,
+    `Webhook token required: ${config.webhookToken ? "yes" : "no"}.`,
+    `Telegram proxy enabled: ${config.telegramProxyUrl ? "yes" : "no"}.`,
+  ].join("\n");
+}
+
+async function sendStartupNotification() {
+  if (!config.startupNotificationEnabled) {
+    return;
+  }
+
+  try {
+    await telegram.sendMessage(startupMessage());
+    logInfo("startup notification sent");
+  } catch (error) {
+    logError("startup notification failed", {
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+}
+
 export const app = new Elysia()
   .onError(({ code, error, set }) => {
     if (error instanceof AppError) {
@@ -118,4 +146,6 @@ if (import.meta.main) {
     telegramProxyEnabled: Boolean(config.telegramProxyUrl),
     tokenRequired: Boolean(config.webhookToken),
   });
+
+  sendStartupNotification();
 }
