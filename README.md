@@ -205,7 +205,7 @@ The bridge URL-encodes username and password before passing the proxy URL to Bun
 Returns a small readiness response:
 
 ```json
-{ "ok": true, "service": "glitchtip-telegram-bridge", "health": "/health" }
+{ "ok": true, "service": "glitchtip-telegram-bridge", "health": "/health", "version": "main", "gitSha": "..." }
 ```
 
 ### `GET /health`
@@ -213,7 +213,7 @@ Returns a small readiness response:
 Returns:
 
 ```json
-{ "ok": true, "service": "glitchtip-telegram-bridge" }
+{ "ok": true, "service": "glitchtip-telegram-bridge", "version": "main", "gitSha": "..." }
 ```
 
 ### `POST /webhook`

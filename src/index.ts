@@ -16,6 +16,11 @@ const telegram = new TelegramClient({
   disableWebPagePreview: config.disableWebPagePreview,
 });
 
+const buildInfo = {
+  version: Bun.env.APP_VERSION ?? "dev",
+  gitSha: Bun.env.GIT_SHA ?? "unknown",
+};
+
 const webhookBodySchema = t.Object(
   {
     text: t.Optional(t.String()),
@@ -99,10 +104,12 @@ export const app = new Elysia()
     ok: true,
     service: "glitchtip-telegram-bridge",
     health: "/health",
+    ...buildInfo,
   }))
   .get("/health", () => ({
     ok: true,
     service: "glitchtip-telegram-bridge",
+    ...buildInfo,
   }))
   .post(
     "/webhook",
@@ -152,6 +159,7 @@ if (import.meta.main) {
   logInfo("server started", {
     host: config.host,
     port: config.port,
+    ...buildInfo,
     telegramProxyEnabled: Boolean(config.telegramProxyUrl),
     startupNotificationEnabled: config.startupNotificationEnabled,
     tokenRequired: Boolean(config.webhookToken),
